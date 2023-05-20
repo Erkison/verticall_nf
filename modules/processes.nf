@@ -2,8 +2,6 @@
 // General processes
 process VERTICALL_REPAIR {
     tag { sample_id }
-    memory { 4.GB * task.attempt }
-
 
     input:
     tuple(val(sample_id), path(assembly))
