@@ -3,13 +3,16 @@ include { VERTICALL_REPAIR; PREPARE_REPAIRED_FILES; VERTICALL_PAIRWISE; VERTICAL
 workflow DIST_TREE {
     take:
         assemblies_ch
+    take:
+        existing_tsv_ch
+
 
     main: 
         VERTICALL_REPAIR(assemblies_ch)
 
         PREPARE_REPAIRED_FILES(VERTICALL_REPAIR.out.collect())
 
-        VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out)
+        VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out, existing_tsv_ch)
 
         VERTICALL_MATRIX(VERTICALL_PAIRWISE.out)
 

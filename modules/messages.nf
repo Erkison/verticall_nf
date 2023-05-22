@@ -4,9 +4,11 @@ def help_message() {
         The typical command for running the pipeline is as follows:
         nextflow run main.nf --assemblies "path/to/assemblies/*.fasta" --output_dir <output_dir>  
         Mandatory arguments:
-         --assemblies               Path with glob of all fasta sequences (e.g., "data/assemblies/*.fasta")
+         --assemblies                   Path with glob of all fasta sequences (e.g., "data/assemblies/*.fasta")
          --output_dir                   Output directory to place output files (e.g., "data/verticall")
         Optional arguments:
+         --existing_tsv                 Path to existing verticall.tsv file. Pairs in this file are skipped in `verticall pairwise` and are concatenated back into the final verticall.tsv output
+         --threads                      Number of threads to use by verticall internal commands
          --help                         This usage statement
          --version                      Version statement
         """

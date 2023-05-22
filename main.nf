@@ -21,13 +21,24 @@ pipeline_start_message(version, final_params)
 include { DIST_TREE } from './modules/workflows.nf'
 
 workflow {
-    // Setup input Channel from assembly path
+    // Setup input Channels
     assemblies_ch = Channel
         .fromPath( final_params.assemblies, checkIfExists: true )
         .map{ file -> tuple (file.simpleName, file) }
-        .ifEmpty { error "Cannot find any directories matching: ${final_params.assemblies}" }
+        .ifEmpty { error "Cannot find any files matching: ${final_params.assemblies}" }
 
-    DIST_TREE(assemblies_ch)
+    if (params.existing_tsv) {
+        existing_tsv_ch = Channel
+            .fromPath( final_params.existing_tsv, checkIfExists: true )
+            .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
+
+    } else {
+        existing_tsv_ch = []
+    }
+    
+    // existing_tsv_ch.view()
+
+    DIST_TREE(assemblies_ch, existing_tsv_ch)
 
 }
 

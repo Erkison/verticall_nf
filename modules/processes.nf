@@ -40,14 +40,25 @@ process VERTICALL_PAIRWISE {
 
     input:
     path(assemblies_dir)
+    path(optional_existing_tsv_file)
 
     output:
     path("verticall.tsv")
 
-
-    """
-    verticall pairwise -i ${assemblies_dir} -o verticall.tsv
-    """
+    script:
+    if (optional_existing_tsv_file) {
+        existing_tsv_arg = "--existing_tsv ${optional_existing_tsv_file}"
+        """
+        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t ${params.threads} ${existing_tsv_arg}
+        sed '1d' ${optional_existing_tsv_file} >> verticall.tsv
+        """
+    } else {
+        existing_tsv_arg = ""
+        """
+        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t ${params.threads}
+        """
+    }
+    
 }
 
 process VERTICALL_MATRIX {
