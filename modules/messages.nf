@@ -8,7 +8,6 @@ def help_message() {
          --output_dir                   Output directory to place output files (e.g., "data/verticall")
         Optional arguments:
          --existing_tsv                 Path to existing verticall.tsv file. Pairs in this file are skipped in `verticall pairwise` and are concatenated back into the final verticall.tsv output
-         --threads                      Number of threads to use by verticall internal commands
          --help                         This usage statement
          --version                      Version statement
         """

@@ -9,7 +9,6 @@ def default_params(){
     params.assemblies = false
     params.output_dir = false
     params.existing_tsv = false
-    params.threads = 8
     return params
 }
 

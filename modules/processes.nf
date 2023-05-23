@@ -49,7 +49,7 @@ process VERTICALL_PAIRWISE {
     if (optional_existing_tsv_file) {
         existing_tsv_arg = "--existing_tsv ${optional_existing_tsv_file}"
         """
-        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t ${params.threads} ${existing_tsv_arg}
+        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus ${existing_tsv_arg}
         sed '1d' ${optional_existing_tsv_file} >> verticall.tsv
         """
     } else {
