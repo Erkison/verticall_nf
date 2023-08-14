@@ -18,7 +18,7 @@ final_params = check_params(merged_params)
 pipeline_start_message(version, final_params)
 
 // include processes and workflows
-include { DIST_TREE } from './modules/workflows.nf'
+include { DIST_TREE; ALIGNMENT } from './modules/workflows.nf'
 
 workflow {
     // Setup input Channels
@@ -31,14 +31,33 @@ workflow {
         existing_tsv_ch = Channel
             .fromPath( final_params.existing_tsv, checkIfExists: true )
             .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
-
     } else {
         existing_tsv_ch = []
     }
     
-    // existing_tsv_ch.view()
+    if (params.reference) {
+        reference_ch = Channel
+            .fromPath( final_params.reference, checkIfExists: true )
+            .ifEmpty { error "Cannot find any files matching: ${final_params.reference}" }
+    } else {
+        reference_ch = []
+    }
 
-    DIST_TREE(assemblies_ch, existing_tsv_ch)
+    if (params.alignment) {
+        alignment_ch = Channel
+            .fromPath( final_params.alignment, checkIfExists: true )
+            .ifEmpty { error "Cannot find any files matching: ${final_params.alignment}" }
+    } else {
+        alignment_ch = []
+    }
+
+    // choose workflow
+    if (params.workflow == "alignment"){
+        ALIGNMENT(assemblies_ch, reference_ch, alignment_ch)
+    } else {
+        DIST_TREE(assemblies_ch, existing_tsv_ch)
+    }
+
 
 }
 

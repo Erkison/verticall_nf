@@ -100,3 +100,43 @@ process VERTICALL_FASTME {
     """
 }
 
+// alignment workflow-specific processes
+process VERTICALL_PAIRWISE_REF {
+    tag { 'verticall pairwise' }
+        
+    publishDir "${params.output_dir}/",
+        mode: 'copy',
+        pattern: "verticall.tsv"
+
+    input:
+    path(assemblies_dir)
+    path(reference)
+
+    output:
+    path("verticall.tsv")
+
+    script:
+    """
+    verticall pairwise -i ${assemblies_dir} -o verticall.tsv -r ${reference}
+    """    
+}
+
+process VERTICALL_MASK {
+    tag { 'verticall mask' }
+        
+    publishDir "${params.output_dir}/",
+        mode: 'copy',
+        pattern: "masked_alignment_variants_only.fasta"
+
+    input:
+    path(verticall_tsv)
+    path(alignment)
+
+    output:
+    path("verticall.phylip")
+
+
+    """
+    verticall mask -i ${verticall_tsv} -a ${alignment} -o masked_alignment_variants_only.fasta --exclude_invariant
+    """
+}
