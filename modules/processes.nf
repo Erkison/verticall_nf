@@ -55,7 +55,7 @@ process VERTICALL_PAIRWISE {
     } else {
         existing_tsv_arg = ""
         """
-        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t ${params.threads}
+        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus
         """
     }
     
