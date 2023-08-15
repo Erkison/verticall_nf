@@ -7,10 +7,10 @@ process VERTICALL_REPAIR {
     tuple(val(sample_id), path(assembly))
 
     output:
-    path("${sample_id}_fixed.fasta")
+    path("${sample_id}.fasta")
 
     """
-    verticall repair -i ${assembly} -o ${sample_id}_fixed.fasta
+    verticall repair -i ${assembly} -o ${sample_id}.fasta
     """
 }
 
