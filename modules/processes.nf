@@ -133,7 +133,7 @@ process VERTICALL_MASK {
     path(alignment)
 
     output:
-    path("verticall.phylip")
+    path("masked_alignment_variants_only.fasta")
 
 
     """
