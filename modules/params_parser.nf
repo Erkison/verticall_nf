@@ -11,6 +11,9 @@ def default_params(){
     params.existing_tsv = false
     params.reference = false
     params.alignment = false
+    params.raxml_prefix = 'verticall'
+    params.raxml_starting_trees = 'pars{10},rand{10}'
+    params.raxml_model = 'GTR+G'
     return params
 }
 

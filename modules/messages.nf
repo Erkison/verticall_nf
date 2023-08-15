@@ -11,6 +11,9 @@ def help_message() {
          --existing_tsv                 Path to existing verticall.tsv file. Pairs in this file are skipped in `verticall pairwise` and are concatenated back into the final verticall.tsv output
          --reference                    Path to reference sequence. Required if workflow == "alignment"
          --alignment                    Path to pseudogenome alignment of all assemblies to the reference. Must include reference sequence and all reference sites. Required if workflow == "alignment"
+         --raxml_prefix                 Prefix for RAxML trees (default: 'verticall')
+         --raxml_starting_trees         Starting trees (default: 'pars{10},rand{10}'). Defaults uses 10 random and 10 parsimony starting trees
+         --raxml_model                  Evolutionary model (default: 'GTR+G')
          --help                         This usage statement
          --version                      Version statement
         """

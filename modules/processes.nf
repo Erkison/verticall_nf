@@ -140,3 +140,24 @@ process VERTICALL_MASK {
     verticall mask -i ${verticall_tsv} -a ${alignment} -o masked_alignment_variants_only.fasta --exclude_invariant
     """
 }
+
+process VERTICALL_RAXMLNG {
+    tag { 'verticall raxmlng' }
+        
+    publishDir "${params.output_dir}/raxmlng",
+        mode: 'copy',
+        pattern: "*.raxml.*"
+
+    input:
+    path(masked_alignment_variants_only)
+
+    output:
+    path("*.raxml.*")
+
+
+    """
+    raxml-ng --all --msa ${masked_alignment_variants_only} --model ${params.raxml_model} \
+        --prefix ${params.raxml_prefix} --tree ${params.raxml_starting_trees} \
+        --seed 2 --bs-metric fbp,tbe
+    """
+}
