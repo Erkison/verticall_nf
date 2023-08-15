@@ -158,6 +158,6 @@ process VERTICALL_RAXMLNG {
     """
     raxml-ng --all --msa ${masked_alignment_variants_only} --model ${params.raxml_model} \
         --prefix ${params.raxml_prefix} --tree ${params.raxml_starting_trees} \
-        --seed 2 --bs-metric fbp,tbe
+        --seed 2 --bs-metric fbp,tbe --threads auto{$task.cpus}
     """
 }
