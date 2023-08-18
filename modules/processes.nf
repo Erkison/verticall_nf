@@ -154,11 +154,18 @@ process VERTICALL_RAXMLNG {
     output:
     path("*.raxml.*")
 
+    script:
+    if (${params.raxml_bootstraps}) {
+        bootstrap_arg = "--bs-metric fbp,tbe --bs-trees ${params.raxml_bs_trees}"
+    } else {
+        bootstrap_arg = ""
+    }
+
 
     """
     raxml-ng --all --msa ${masked_alignment_variants_only} --model ${params.raxml_model} \
         --prefix ${params.raxml_prefix} --tree ${params.raxml_starting_trees} \
-        --seed 2 --bs-metric fbp,tbe --bs-trees ${params.raxml_bootstraps} \
+        --seed 2  ${bootstrap_arg} \
         --threads auto{$task.cpus}
     """
 }

@@ -14,7 +14,8 @@ def help_message() {
          --raxml_prefix                 Prefix for RAxML trees (default: 'verticall')
          --raxml_starting_trees         Starting trees (default: 'pars{10},rand{10}'). Defaults uses 10 random and 10 parsimony starting trees
          --raxml_model                  Evolutionary model (default: 'GTR+G')
-         --raxml_bootstraps             Number of bootstraps (default: 100)
+         --raxml_bootstraps             Whether or not to run bootstrapping ('fbp,tbe'). Default: false
+         --raxml_bs_trees               Number of bootstrap replicates (default: 100). Only applied when raxml_bootstraps == true
          --help                         This usage statement
          --version                      Version statement
         """
