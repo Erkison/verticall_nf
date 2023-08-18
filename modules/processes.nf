@@ -155,7 +155,7 @@ process VERTICALL_RAXMLNG {
     path("*.raxml.*")
 
     script:
-    if (${params.raxml_bootstraps}) {
+    if (params.raxml_bootstraps) {
         bootstrap_arg = "--bs-metric fbp,tbe --bs-trees ${params.raxml_bs_trees}"
     } else {
         bootstrap_arg = ""
