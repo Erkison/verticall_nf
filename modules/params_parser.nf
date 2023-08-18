@@ -14,6 +14,7 @@ def default_params(){
     params.raxml_prefix = 'verticall'
     params.raxml_starting_trees = 'pars{10},rand{10}'
     params.raxml_model = 'GTR+G'
+    params.raxml_bootstraps = 100
     return params
 }
 
