@@ -9,6 +9,7 @@ process VERTICALL_REPAIR {
     output:
     path("${sample_id}.fasta")
 
+    script:
     """
     verticall repair -i ${assembly} -o ${sample_id}.fasta
     """
@@ -23,6 +24,7 @@ process PREPARE_REPAIRED_FILES {
     output:
     path("verticall_repair")
 
+    script:
     """
     mkdir verticall_repair
     cp ${repaired_assemblies} verticall_repair
@@ -74,7 +76,7 @@ process VERTICALL_MATRIX {
     output:
     path("verticall.phylip")
 
-
+    script:
     """
     verticall matrix -i ${verticall_tsv} -o verticall.phylip
     """
@@ -93,7 +95,7 @@ process VERTICALL_FASTME {
     output:
     path("verticall.newick")
 
-
+    script:
     """
     fastme --method B --nni B --spr -i ${verticall_phylip} -o verticall.newick
 
@@ -135,7 +137,7 @@ process VERTICALL_MASK {
     output:
     path("masked_alignment_variants_only.fasta")
 
-
+    script:
     """
     verticall mask -i ${verticall_tsv} -a ${alignment} -o masked_alignment_variants_only.fasta --exclude_invariant
     """
