@@ -6,5 +6,6 @@ channels:
 dependencies:
   - anaconda::python=3.8
   - bioconda::fastme=2.1.6.1
+  - bioconda::raxml-ng=1.0.1
   - pip:
     - verticall @ git+https://github.com/rrwick/Verticall.git
