@@ -158,16 +158,14 @@ process VERTICALL_RAXMLNG {
 
     script:
     if (params.raxml_bootstraps) {
-        bootstrap_arg = "--bs-metric fbp,tbe --bs-trees ${params.raxml_bs_trees}"
+        tree_search_arg = "--all --bs-metric fbp,tbe --bs-trees ${params.raxml_bs_trees}"
     } else {
-        bootstrap_arg = ""
+        tree_search_arg = ""
     }
 
-
     """
-    raxml-ng --all --msa ${masked_alignment_variants_only} --model ${params.raxml_model} \
+    raxml-ng ${tree_search_arg} --msa ${masked_alignment_variants_only} --model ${params.raxml_model} \
         --prefix ${params.raxml_prefix} --tree ${params.raxml_starting_trees} \
-        --seed 2  ${bootstrap_arg} \
-        --threads auto{$task.cpus}
+        --seed 2 --threads auto{$task.cpus}
     """
 }
