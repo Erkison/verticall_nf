@@ -1,7 +1,9 @@
 # Verticall_nf
 This is a nextflow implementation of [Verticall](https://github.com/rrwick/Verticall) by Ryan Wick
 
-## Local run
+## Example usage with distance workflow
+
+### Local run
 ```
 nextflow run verticall_nf/main.nf \
     --workflow "distance" --assemblies "path/to/assemblies/*.fasta" --output_dir path/to/output/dir \
@@ -10,7 +12,7 @@ nextflow run verticall_nf/main.nf \
     -resume
 ```
 
-## MASSIVE run
+### MASSIVE run
 ```
 nextflow run verticall_nf/main.nf \
     --workflow "distance" --assemblies "path/to/assemblies/*.fasta" --output_dir path/to/output/dir \
