@@ -4,10 +4,18 @@ def help_message() {
         The typical command for running the pipeline is as follows:
         nextflow run main.nf --assemblies "path/to/assemblies/*.fasta" --output_dir <output_dir>  
         Mandatory arguments:
+         --workflow                     Workflow to run. One of "distance" or "alignment"
          --assemblies                   Path with glob of all fasta sequences (e.g., "data/assemblies/*.fasta")
          --output_dir                   Output directory to place output files (e.g., "data/verticall")
         Optional arguments:
          --existing_tsv                 Path to existing verticall.tsv file. Pairs in this file are skipped in `verticall pairwise` and are concatenated back into the final verticall.tsv output
+         --reference                    Path to reference sequence. Required if workflow == "alignment"
+         --alignment                    Path to pseudogenome alignment of all assemblies to the reference. Must include reference sequence and all reference sites. Required if workflow == "alignment"
+         --raxml_prefix                 Prefix for RAxML trees (default: 'verticall')
+         --raxml_starting_trees         Starting trees (default: 'pars{10},rand{10}'). Defaults uses 10 random and 10 parsimony starting trees
+         --raxml_model                  Evolutionary model (default: 'GTR+G')
+         --raxml_bootstraps             Whether or not to run bootstrapping ('fbp,tbe'). Default: false
+         --raxml_bs_trees               Number of bootstrap replicates (default: 100). Only applied when raxml_bootstraps == true
          --help                         This usage statement
          --version                      Version statement
         """
