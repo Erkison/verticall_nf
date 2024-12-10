@@ -29,7 +29,7 @@ process PREPARE_REPAIRED_FILES {
     mkdir verticall_repair
     for f in ${repaired_assemblies}; do
       n=\$(basename \$f _fixed.fasta);
-      cp \$f \${n}.fasta verticall_repair;
+      cp \$f verticall_repair/\${n}.fasta;
     done
     """
     
