@@ -78,7 +78,7 @@ process VERTICALL_MATRIX {
 
     script:
     """
-    verticall matrix -i ${verticall_tsv} -o verticall.phylip
+    verticall matrix -i ${verticall_tsv} -o verticall.phylip --multi ${params.multi}
     """
 }
 
