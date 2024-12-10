@@ -24,7 +24,7 @@ workflow {
     // Setup input Channels
     assemblies_ch = Channel
         .fromPath( final_params.assemblies, checkIfExists: true )
-        .map{ file -> tuple (file.simpleName, file) }
+        .map{ file -> tuple (file.baseName, file) }
         .ifEmpty { error "Cannot find any files matching: ${final_params.assemblies}" }
 
     if (params.existing_tsv) {
