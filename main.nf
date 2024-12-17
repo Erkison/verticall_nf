@@ -39,13 +39,11 @@ workflow {
                 .fromPath(renamed_tsv, checkIfExists: true)
                 .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
         } else {
-            println("Did not rename")
             existing_tsv_ch = Channel
                 .fromPath( final_params.existing_tsv, checkIfExists: true )
                 .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
         } 
     } else {
-        println("Why am I here?")
         existing_tsv_ch = []
     }
     
