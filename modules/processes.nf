@@ -45,20 +45,18 @@ process VERTICALL_PAIRWISE {
 
     input:
     path(assemblies_dir)
-    path(optional_existing_tsv_file)
+    path(existing_tsv_file)
 
     output:
     path("verticall.tsv")
 
     script:
-    if (optional_existing_tsv_file) {
-        existing_tsv_arg = "--existing_tsv ${optional_existing_tsv_file}"
+    if (existing_tsv_file) {
         """
-        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus ${existing_tsv_arg}
-        sed '1d' ${optional_existing_tsv_file} >> verticall.tsv
+        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus --existing_tsv ${existing_tsv_file}
+        sed '1d' ${existing_tsv_file} >> verticall.tsv
         """
     } else {
-        existing_tsv_arg = ""
         """
         verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus
         """
@@ -101,7 +99,6 @@ process VERTICALL_FASTME {
     script:
     """
     fastme --method B --nni B --spr -i ${verticall_phylip} -o verticall.newick
-
     """
 }
 

@@ -24,10 +24,28 @@ workflow {
         .ifEmpty { error "Cannot find any files matching: ${final_params.assemblies}" }
 
     if (params.existing_tsv) {
-        existing_tsv_ch = Channel
-            .fromPath( final_params.existing_tsv, checkIfExists: true )
-            .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
+        // Rename existing tsv file if filename is 'verticall.tsv' (same as output)
+        def existing_tsv_path = file(params.existing_tsv)
+        def existing_tsv_parent = existing_tsv_path.getParent()
+        def existing_tsv_fn = existing_tsv_path.getName()
+        if (!existing_tsv_path.exists()) {
+            error "The specified file '${params.existing_tsv}' does not exist!"
+        }
+        if (existing_tsv_fn == 'verticall.tsv') {
+            def renamed_tsv = file("${existing_tsv_parent}/previous_verticall.tsv")
+            existing_tsv_path.renameTo(renamed_tsv)
+            println "Renamed existing tsv file ${existing_tsv_fn} to ${renamed_tsv.getName()}"
+            existing_tsv_ch = Channel
+                .fromPath(renamed_tsv, checkIfExists: true)
+                .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
+        } else {
+            println("Did not rename")
+            existing_tsv_ch = Channel
+                .fromPath( final_params.existing_tsv, checkIfExists: true )
+                .ifEmpty { error "Cannot find any files matching: ${final_params.existing_tsv}" }
+        } 
     } else {
+        println("Why am I here?")
         existing_tsv_ch = []
     }
     
