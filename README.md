@@ -4,19 +4,20 @@ This is a nextflow implementation of [Verticall](https://github.com/rrwick/Verti
 ## Installation
 First install [nextflow](https://www.nextflow.io/docs/stable/install.html) if you dont already have it installed.
 
+Clone this repo
 ```
-# Clone this repo
 git clone https://github.com/Erkison/verticall_nf.git
-
-# Install verticall and other dependencies
+```
+Install verticall and other dependencies
+```
 cd verticall_nf
 conda env create -f conda_environments/verticall.yml
 # OR
 mamba env create -f conda_environments/verticall.yml
-
-# Activate the environment
+```
+Activate the environment
+```
 conda activate verticall
-
 ```
 
 ## Example usage with distance workflow
@@ -33,7 +34,7 @@ nextflow run main.nf --workflow "distance" --assemblies "assemblies/*.fasta" --o
     -profile slurm -resume
 ```
 
-For full list of available options, run:
+The pipeline mostly uses default Verticall parameters, but some options are customisable. For a full list of available options, run:
 ```
 nextflow run main.nf --help
 ```
