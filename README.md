@@ -2,14 +2,17 @@
 This is a nextflow implementation of [Verticall](https://github.com/rrwick/Verticall) by Ryan Wick
 
 ## Installation
+First install [nextflow](https://www.nextflow.io/docs/stable/install.html) if you dont already have it installed.
+
 ```
 # Clone this repo
 git clone https://github.com/Erkison/verticall_nf.git
 
 # Install verticall and other dependencies
-conda env create -f verticall_nf/conda_environments/verticall.yml
+cd verticall_nf
+conda env create -f conda_environments/verticall.yml
 # OR
-mamba env create -f verticall_nf/conda_environments/verticall.yml
+mamba env create -f conda_environments/verticall.yml
 
 # Activate the environment
 conda activate verticall
@@ -20,18 +23,17 @@ conda activate verticall
 
 ### Local run
 ```
-nextflow run verticall_nf/main.nf \
-    --workflow "distance" --assemblies "path/to/assemblies/*.fasta" --output_dir path/to/output/dir \
-    [--existing_tsv path/to/old_verticall.tsv] \
-    -profile local \
-    -resume
+nextflow run main.nf --workflow "distance" --assemblies "assemblies/*.fasta" --output_dir verticall_out/ \
+    -profile local -resume
 ```
 
-### MASSIVE run
+### Slurm run
 ```
-nextflow run verticall_nf/main.nf \
-    --workflow "distance" --assemblies "path/to/assemblies/*.fasta" --output_dir path/to/output/dir \
-    [--existing_tsv path/to/old_verticall.tsv] \
-    -profile standard -resume
-    
+nextflow run main.nf --workflow "distance" --assemblies "assemblies/*.fasta" --output_dir verticall_out/ \
+    -profile slurm -resume
+```
+
+For full list of available options, run:
+```
+nextflow run main.nf --help
 ```
