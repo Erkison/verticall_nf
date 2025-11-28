@@ -65,7 +65,7 @@ workflow {
 
     // choose workflow
     if (params.workflow == "alignment"){
-        ALIGNMENT(assemblies_ch, reference_ch, alignment_ch)
+        ALIGNMENT(assemblies_ch, existing_tsv_ch, reference_ch, alignment_ch)
     } else {
         DIST_TREE(assemblies_ch, existing_tsv_ch)
     }

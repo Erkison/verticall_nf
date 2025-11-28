@@ -6,25 +6,33 @@ def help_message() {
 
         The pipeline mostly uses default Verticall parameters, but some options are customisable here.
         Mandatory arguments:
-          General:
+          Main:
             --workflow              Workflow to run. One of "distance" or "alignment"
             --assemblies            Path with glob of all fasta sequences (e.g., "data/assemblies/*.fasta")
             --output_dir            Output directory to place output files (e.g., "data/verticall")
           Alignment workflow:
             --reference             Path to reference sequence. Required if workflow == "alignment"
-            --alignment             Path to pseudogenome alignment of all assemblies to the reference. 
-                                    Must include reference sequence and all reference sites. Required if workflow == "alignment"
+            
         Optional arguments:
           General:
             --existing_tsv          Path to existing verticall.tsv file from interrupted run. 
                                     Pairs in this file are skipped in `verticall pairwise` and are concatenated back into the final verticall.tsv output
             --multi                 How to handle close calls. One of 'first', 'exclude', 'high', or 'low'. (default: 'first').
           Alignment workflow:
-            --raxml_prefix          Prefix for RAxML-NG trees (default: 'verticall')
+            --alignment             Path to pseudogenome alignment of all assemblies to the reference. 
+                                    Must include reference sequence and all reference sites. If not provided, an alignment will be made using ska2.
+            --tree_builder          Tree builder to use. One of 'raxmlng' or 'iqtree'. (default: 'raxmlng')
+            --tree_prefix           Prefix for RAxML-NG trees (default: 'verticall')
+          RAxML-NG options:
             --raxml_starting_trees  Starting trees (default: 'pars{10},rand{10}'). Defaults uses 10 random and 10 parsimony starting trees
             --raxml_model           Evolutionary model (default: 'GTR+G')
             --raxml_bootstraps      Whether or not to run bootstrapping ('fbp,tbe'). Default: false
-            --raxml_bs_trees        Number of bootstrap replicates (default: 100). Only applied when raxml_bootstraps == true
+            --raxml_bs_trees        Number of bootstrap replicates (default: 100)
+          IQ-tree options:
+            --iqtree_bootsraps      Whether or not to run ultrafast bootstrapping. Default: false
+            --iqtree_bs_trees       Number of ultrafast bootstrap replicates (default: 1000)
+            --iqtree_bs_bnni        Whether to perform the BNNI step to reduce overestimation of branch supports. Default: true
+        Other:    
             --help                  This usage statement
             --version               Version statement
         """

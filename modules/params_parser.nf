@@ -13,6 +13,10 @@ def check_params(Map params) {
     allowed_multi_values = ['first', 'exclude', 'high', 'low']
     final_params.multi = check_parameter_value('multi', params.multi, allowed_multi_values)
 
+    // check tree builder value
+    allowed_tb_values = ['raxmlng', 'iqtree']
+    final_params.workflow = check_parameter_value('tree_builder', params.tree_builder, allowed_tb_values)
+
     // set up assembly files
     final_params.assemblies = check_mandatory_parameter(params, 'assemblies')
      
@@ -23,10 +27,7 @@ def check_params(Map params) {
     if (params.workflow == "alignment") {
         // reference file
         final_params.reference = check_mandatory_parameter(params, 'reference')
-
-        final_params.alignment = check_mandatory_parameter(params, 'alignment')
     }
 
-      
     return final_params
 }

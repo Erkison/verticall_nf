@@ -35,7 +35,6 @@ process PREPARE_REPAIRED_FILES {
     
 }
 
-//Distance tree-specific processes
 process VERTICALL_PAIRWISE {
     tag { 'verticall pairwise' }
         
@@ -46,23 +45,36 @@ process VERTICALL_PAIRWISE {
     input:
     path(assemblies_dir)
     path(existing_tsv_file)
+    path(reference)
 
     output:
     path("verticall.tsv")
 
     script:
-    if (existing_tsv_file) {
-        """
-        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus --existing_tsv ${existing_tsv_file}
-        sed '1d' ${existing_tsv_file} >> verticall.tsv
-        """
-    } else {
-        """
-        verticall pairwise -i ${assemblies_dir} -o verticall.tsv -t $task.cpus
-        """
-    }
-    
+    """
+    # Prepare arguments
+    if [[ "${reference}" != "" ]]; then
+      ref_arg="-r ${reference}"
+    else
+      ref_arg=""
+    fi
+    if [[ "${existing_tsv_file}" != "" ]]; then
+      existing_tsv_arg="--existing_tsv ${existing_tsv_file}"
+    else
+      existing_tsv_arg=""
+    fi
+
+    # Run
+    verticall pairwise -i ${assemblies_dir} -o verticall.tsv \${ref_arg} \${existing_tsv_arg} -t $task.cpus
+
+    # Append existing tsv contents except header
+    if [[ "${existing_tsv_file}" != "" ]]; then
+      sed '1d' ${existing_tsv_file} >> verticall.tsv
+    fi
+    """
 }
+
+// distance workflow-specific processes
 
 process VERTICALL_MATRIX {
     tag { 'verticall matrix' }
@@ -102,70 +114,95 @@ process VERTICALL_FASTME {
     """
 }
 
+
 // alignment workflow-specific processes
-process VERTICALL_PAIRWISE_REF {
-    tag { 'verticall pairwise' }
-        
+
+process GENERATE_ALIGNMENT {
+    tag { 'generate alignment' }
+    
     publishDir "${params.output_dir}/",
         mode: 'copy',
-        pattern: "verticall.tsv"
+        pattern: "alignment.fasta"
 
     input:
     path(assemblies_dir)
     path(reference)
 
     output:
-    path("verticall.tsv")
+    path("alignment.fasta")
 
     script:
     """
-    verticall pairwise -i ${assemblies_dir} -o verticall.tsv -r ${reference}
-    """    
+    # Prepare input list for ska
+    for each in ${assemblies_dir}/*.fasta ; do
+        sample=\$(basename \$each .fasta);
+        echo -e "\$sample\t\$each" >> input_list.txt
+    done
+
+    # Generate alignment
+    python3 ${projectDir}/bin/generate_ska_alignment.py --reference ${reference} \
+        --input input_list.txt --out alignment
+
+    # Append reference to alignment 
+    ref_name=\$(basename ${reference} .fasta)
+    sed "1s/^.*/>\${ref_name}/" ${reference} >> alignment.fasta
+    """
 }
+
 
 process VERTICALL_MASK {
     tag { 'verticall mask' }
         
     publishDir "${params.output_dir}/",
         mode: 'copy',
-        pattern: "masked_alignment_variants_only.fasta"
+        pattern: "masked_alignment.fasta"
 
     input:
     path(verticall_tsv)
     path(alignment)
 
     output:
-    path("masked_alignment_variants_only.fasta")
+    path("masked_alignment.fasta")
 
     script:
     """
-    verticall mask -i ${verticall_tsv} -a ${alignment} -o masked_alignment_variants_only.fasta --exclude_invariant
+    verticall mask -i ${verticall_tsv} -a ${alignment} -o masked_alignment.fasta --multi ${params.multi} 
     """
 }
 
-process VERTICALL_RAXMLNG {
-    tag { 'verticall raxmlng' }
+
+process VERTICALL_ALN_TREE {
+    tag { 'verticall tree' }
         
-    publishDir "${params.output_dir}/raxmlng",
+    publishDir "${params.output_dir}/${params.tree_builder}",
         mode: 'copy',
-        pattern: "*.raxml.*"
+        pattern: "*"
 
     input:
-    path(masked_alignment_variants_only)
+    path(alignment)
 
     output:
-    path("*.raxml.*")
+    path("*")
 
     script:
     if (params.raxml_bootstraps) {
-        tree_search_arg = "--all --bs-metric fbp,tbe --bs-trees ${params.raxml_bs_trees}"
-    } else {
-        tree_search_arg = ""
-    }
+        raxmlng_search = "--all --bs-metric fbp,tbe --bs-trees ${params.raxml_bs_trees}"
+    } else {raxmlng_search = ""}
+    if (params.iqtree_bootsraps) {
+        if (params.iqtree_bs_bnni) {
+            iqtree_bs_args = "-B ${params.iqtree_bs_trees} -bnni"
+        } else {
+            iqtree_bs_args = "-B ${params.iqtree_bs_trees}"
+        }
+    } else {iqtree_bs_args = ""}
 
     """
-    raxml-ng ${tree_search_arg} --msa ${masked_alignment_variants_only} --model ${params.raxml_model} \
-        --prefix ${params.raxml_prefix} --tree ${params.raxml_starting_trees} \
-        --seed 2 --threads auto{$task.cpus}
+    if [[ "${params.tree_builder}" == "iqtree" ]]; then
+        iqtree2 -s ${alignment} ${iqtree_bs_args} -pre ${params.tree_prefix} -nt $task.cpus
+    elif [[ "${params.tree_builder}" == "raxmlng" ]]; then
+        raxml-ng ${raxmlng_search} --msa ${alignment} --model ${params.raxml_model} \
+            --prefix ${params.tree_prefix} --tree ${params.raxml_starting_trees} \
+            --seed 2 --threads auto{$task.cpus}
+    fi
     """
 }
