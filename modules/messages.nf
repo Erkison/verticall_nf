@@ -21,8 +21,13 @@ def help_message() {
           Alignment workflow:
             --alignment             Path to pseudogenome alignment of all assemblies to the reference. 
                                     Must include reference sequence and all reference sites. If not provided, an alignment will be made using ska2.
+            --filter_alignment      Whether to filter the masked alignment to core sites only. (default: true)
+            --core_threshold        Proportion of genomes a site must be present in to be considered core. (default: 0.95)
+            --exclude_invariant     Whether to exclude invariant sites from the filtered alignment. (default: true)
+          Alignment tree building:
             --tree_builder          Tree builder to use. One of 'raxmlng' or 'iqtree'. (default: 'raxmlng')
             --tree_prefix           Prefix for RAxML-NG trees (default: 'verticall')
+            --include_ref           Whether to include the reference sequence in the final tree. (default: false)
           RAxML-NG options:
             --raxml_starting_trees  Starting trees (default: 'pars{10},rand{10}'). Defaults uses 10 random and 10 parsimony starting trees
             --raxml_model           Evolutionary model (default: 'GTR+G')

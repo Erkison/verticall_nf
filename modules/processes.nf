@@ -126,7 +126,7 @@ process GENERATE_ALIGNMENT {
 
     input:
     path(assemblies_dir)
-    path(reference)
+    tuple(val(ref_name), path(reference))
 
     output:
     path("alignment.fasta")
@@ -143,9 +143,8 @@ process GENERATE_ALIGNMENT {
     python3 ${projectDir}/bin/generate_ska_alignment.py --reference ${reference} \
         --input input_list.txt --out alignment
 
-    # Append reference to alignment 
-    ref_name=\$(basename ${reference} .fasta)
-    sed "1s/^.*/>\${ref_name}/" ${reference} >> alignment.fasta
+    # Append reference to alignment with sequence on a single line
+    sed "1s/^.*/>${ref_name}/" ${reference} >> alignment.fasta
     """
 }
 
@@ -155,18 +154,62 @@ process VERTICALL_MASK {
         
     publishDir "${params.output_dir}/",
         mode: 'copy',
-        pattern: "masked_alignment.fasta"
+        pattern: "*.fasta"
 
     input:
     path(verticall_tsv)
     path(alignment)
+    tuple(val(ref_name), path(reference))
 
     output:
-    path("masked_alignment.fasta")
+    path("masked_alignment.fasta"), emit: alignment_no_ref
+    path("masked_alignment_with_ref.fasta"), emit: alignment_with_ref
 
     script:
     """
-    verticall mask -i ${verticall_tsv} -a ${alignment} -o masked_alignment.fasta --multi ${params.multi} 
+    verticall mask -i ${verticall_tsv} -a ${alignment} \
+        --reference ${ref_name} --multi ${params.multi} \
+        -o masked_alignment_with_ref.fasta
+
+    cat masked_alignment_with_ref.fasta | paste - - | grep -v ">${ref_name}" | tr '\t' '\n' > masked_alignment.fasta
+    """
+}
+
+
+process FILTER_MASKED_ALIGNMENT {
+    tag { 'filter masked alignment' }
+        
+    publishDir "${params.output_dir}/",
+        mode: 'copy',
+        pattern: "masked_alignment_filtered.fasta"
+    
+    publishDir "${params.output_dir}/",
+        mode: 'copy',
+        pattern: "coresnpfilter.log",
+        overwrite: true
+
+    input:
+    path(alignment)
+
+    output:
+    path("masked_alignment_filtered.fasta"), emit: filtered_alignment
+    path("coresnpfilter.log")
+
+    script:
+    if (params.exclude_invariant) {
+        exclude_invariant="-e"
+    } else {
+        exclude_invariant=""
+    }
+    if (params.core_threshold) {
+        core_filter_arg="-c ${params.core_threshold}"
+    } else {
+        core_filter_arg=""
+    }
+    """
+    coresnpfilter ${exclude_invariant} ${core_filter_arg} \
+        ${alignment} > masked_alignment_filtered.fasta \
+        2> coresnpfilter.log
     """
 }
 

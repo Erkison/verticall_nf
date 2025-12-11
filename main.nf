@@ -50,6 +50,7 @@ workflow {
     if (params.reference) {
         reference_ch = Channel
             .fromPath( final_params.reference, checkIfExists: true )
+            .map{ file -> tuple (file.baseName, file) }
             .ifEmpty { error "Cannot find any files matching: ${final_params.reference}" }
     } else {
         reference_ch = []

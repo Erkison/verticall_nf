@@ -13,6 +13,18 @@ def check_params(Map params) {
     allowed_multi_values = ['first', 'exclude', 'high', 'low']
     final_params.multi = check_parameter_value('multi', params.multi, allowed_multi_values)
 
+
+    // check core_threshold value
+    try {
+        core_threshold_value = params.core_threshold.toBigDecimal()
+        if (core_threshold_value < 0 || core_threshold_value > 1) {
+            error "'--core_threshold' must be between 0 and 1 (inclusive). Provided value: ${params.core_threshold}"
+        }
+        final_params.core_threshold = core_threshold_value
+    } catch (Exception e) {
+        error "--core_threshold' must be between 0 and 1 (inclusive). Provided value: ${params.core_threshold}"
+    }
+
     // check tree builder value
     allowed_tb_values = ['raxmlng', 'iqtree']
     final_params.workflow = check_parameter_value('tree_builder', params.tree_builder, allowed_tb_values)

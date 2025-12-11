@@ -1,5 +1,5 @@
 include { VERTICALL_REPAIR; PREPARE_REPAIRED_FILES; VERTICALL_PAIRWISE; VERTICALL_MATRIX; 
-            VERTICALL_FASTME; GENERATE_ALIGNMENT; VERTICALL_MASK; VERTICALL_ALN_TREE } from '../modules/processes.nf' 
+            VERTICALL_FASTME; GENERATE_ALIGNMENT; VERTICALL_MASK; FILTER_MASKED_ALIGNMENT; VERTICALL_ALN_TREE } from '../modules/processes.nf' 
 
 workflow DIST_TREE {
     take:
@@ -11,14 +11,14 @@ workflow DIST_TREE {
 
         PREPARE_REPAIRED_FILES(VERTICALL_REPAIR.out.collect())
 
-        VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out, existing_tsv_ch, reference_ch=[])
+        VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out, existing_tsv_ch, [])
 
         VERTICALL_MATRIX(VERTICALL_PAIRWISE.out)
 
         VERTICALL_FASTME(VERTICALL_MATRIX.out)
 
     emit:
-        VERTICALL_FASTME.out
+        VERTICALL_PAIRWISE.out
 }
 
 
@@ -34,19 +34,30 @@ workflow ALIGNMENT {
 
         PREPARE_REPAIRED_FILES(VERTICALL_REPAIR.out.collect())
 
-        VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out, existing_tsv_ch, reference_ch)
+        VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out, existing_tsv_ch, reference_ch.map{ it[1] })
 
         if (!alignment_ch) {
             GENERATE_ALIGNMENT(PREPARE_REPAIRED_FILES.out, reference_ch)
-            alignment_final = GENERATE_ALIGNMENT.out
+            alignment = GENERATE_ALIGNMENT.out
         } else {
-            alignment_final = alignment_ch
+            alignment = alignment_ch
         }
 
-        VERTICALL_MASK(VERTICALL_PAIRWISE.out, alignment_final)
+        VERTICALL_MASK(VERTICALL_PAIRWISE.out, alignment, reference_ch)
 
-        VERTICALL_ALN_TREE(VERTICALL_MASK.out)
+        if (params.include_ref) {
+            masked_alignment = VERTICALL_MASK.out.alignment_with_ref
+        } else {
+            masked_alignment = VERTICALL_MASK.out.alignment_no_ref
+        }
+
+        if (params.filter_alignment) {
+            FILTER_MASKED_ALIGNMENT(masked_alignment)
+            masked_alignment = FILTER_MASKED_ALIGNMENT.out.filtered_alignment
+        }
+
+        VERTICALL_ALN_TREE(masked_alignment)
 
     emit:
-        VERTICALL_MASK.out
+        VERTICALL_PAIRWISE.out
 }
