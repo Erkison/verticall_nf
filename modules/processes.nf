@@ -141,7 +141,7 @@ process GENERATE_ALIGNMENT {
 
     # Generate alignment
     python3 ${projectDir}/bin/generate_ska_alignment.py --reference ${reference} \
-        --input input_list.txt --out alignment
+        --input input_list.txt --out alignment --threads $task.cpus
 
     # Append reference to alignment with sequence on a single line
     sed "1s/^.*/>${ref_name}/" ${reference} >> alignment.fasta
