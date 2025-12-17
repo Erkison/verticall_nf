@@ -117,37 +117,53 @@ process VERTICALL_FASTME {
 
 // alignment workflow-specific processes
 
-process GENERATE_ALIGNMENT {
-    tag { 'generate alignment' }
-    
-    publishDir "${params.output_dir}/",
-        mode: 'copy',
-        pattern: "alignment.fasta"
+process SNIPPY_ALIGN {
+    tag { sample_id }
 
     input:
-    path(assemblies_dir)
+    tuple(val(sample_id), path(assembly))
     tuple(val(ref_name), path(reference))
 
     output:
-    path("alignment.fasta")
+    path("${sample_id}/"), emit: snippy_outdir
 
     script:
     """
-    # Prepare input list for ska
-    for each in ${assemblies_dir}/*.fasta ; do
-        sample=\$(basename \$each .fasta);
-        echo -e "\$sample\t\$each" >> input_list.txt
-    done
-
-    # Generate alignment
-    python3 ${projectDir}/bin/generate_ska_alignment.py --reference ${reference} \
-        --input input_list.txt --out alignment --threads $task.cpus
-
-    # Append reference to alignment with sequence on a single line
-    sed "1s/^.*/>${ref_name}/" ${reference} >> alignment.fasta
+    snippy --cpus $task.cpus --outdir ${sample_id} --ref ${reference} --ctgs ${assembly}
     """
 }
 
+// need a process for the snippy-core command
+process SNIPPY_CORE {
+    tag { 'snippy core' }
+
+    publishDir "${params.output_dir}/snippy/",
+        mode: 'copy',
+        pattern: "*.*"
+
+    input:
+    path(snippy_dirs)
+    val(ref_name)
+
+    output:
+    path("clean.full.aln"), emit: clean_alignment
+    path("core.full.aln"), emit: core_alignment
+    path("*.*")
+
+    script:
+    """
+    # Get the reference from the first directory
+    ref_fa=\$(ls ${snippy_dirs[0]}/ref.fa 2>/dev/null || ls ${snippy_dirs[0]}/reference.fa 2>/dev/null)
+    
+    # Get all directory names
+    dirs=\$(for dir in ${snippy_dirs}; do basename \$dir; done | tr '\n' ' ')
+    
+    # Run snippy-core with all directories
+    snippy-core --ref "\${ref_fa}" \${dirs}
+    sed "s/>Reference/>${ref_name}/" core.full.aln > core_renamed.full.aln
+    snippy-clean_full_aln core_renamed.full.aln > clean.full.aln
+    """
+}
 
 process VERTICALL_MASK {
     tag { 'verticall mask' }

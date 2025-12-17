@@ -20,7 +20,9 @@ def help_message() {
             --multi                 How to handle close calls. One of 'first', 'exclude', 'high', or 'low'. (default: 'first').
           Alignment workflow:
             --alignment             Path to pseudogenome alignment of all assemblies to the reference. 
-                                    Must include reference sequence and all reference sites. If not provided, an alignment will be made using ska2.
+                                    Must include reference sequence (named as in reference filename without extension, 
+                                    e.g., ">reference" if file name is "reference.fasta") and all reference positions. 
+                                    If not provided, an alignment will be made using snippy with default parameters.
             --filter_alignment      Whether to filter the masked alignment to core sites only. (default: true)
             --core_threshold        Proportion of genomes a site must be present in to be considered core. (default: 0.95)
             --exclude_invariant     Whether to exclude invariant sites from the filtered alignment. (default: true)

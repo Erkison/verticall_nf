@@ -1,5 +1,6 @@
 include { VERTICALL_REPAIR; PREPARE_REPAIRED_FILES; VERTICALL_PAIRWISE; VERTICALL_MATRIX; 
-            VERTICALL_FASTME; GENERATE_ALIGNMENT; VERTICALL_MASK; FILTER_MASKED_ALIGNMENT; VERTICALL_ALN_TREE } from '../modules/processes.nf' 
+            VERTICALL_FASTME; GENERATE_ALIGNMENT; VERTICALL_MASK; FILTER_MASKED_ALIGNMENT; 
+            SNIPPY_ALIGN; SNIPPY_CORE; VERTICALL_ALN_TREE } from '../modules/processes.nf' 
 
 workflow DIST_TREE {
     take:
@@ -37,8 +38,9 @@ workflow ALIGNMENT {
         VERTICALL_PAIRWISE(PREPARE_REPAIRED_FILES.out, existing_tsv_ch, reference_ch.map{ it[1] })
 
         if (!alignment_ch) {
-            GENERATE_ALIGNMENT(PREPARE_REPAIRED_FILES.out, reference_ch)
-            alignment = GENERATE_ALIGNMENT.out
+            SNIPPY_ALIGN(assemblies_ch, reference_ch.first())
+            SNIPPY_CORE(SNIPPY_ALIGN.out.snippy_outdir.collect(), reference_ch.map{ it[0] })
+            alignment = SNIPPY_CORE.out.clean_alignment
         } else {
             alignment = alignment_ch
         }

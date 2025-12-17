@@ -9,7 +9,7 @@ dependencies:
   - bioconda::fastme=2.1.6.1
   - bioconda::raxml-ng=1.0.1
   - bioconda::iqtree=2.3.6
-  - bioconda::ska2=0.5.0
+  - bioconda::snippy=4.6.0
   - bioconda::core-snp-filter=0.2.0
   - pip:
     - verticall @ git+https://github.com/rrwick/Verticall.git
