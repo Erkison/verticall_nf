@@ -160,8 +160,8 @@ process SNIPPY_CORE {
     
     # Run snippy-core with all directories
     snippy-core --ref "\${ref_fa}" \${dirs}
-    sed "s/>Reference/>${ref_name}/" core.full.aln > core_renamed.full.aln
-    snippy-clean_full_aln core_renamed.full.aln > clean.full.aln
+    sed -i '' "s/>Reference/>${ref_name}/" core.full.aln
+    snippy-clean_full_aln core.full.aln > clean.full.aln
     """
 }
 
@@ -231,7 +231,7 @@ process FILTER_MASKED_ALIGNMENT {
 
 
 process VERTICALL_ALN_TREE {
-    tag { 'verticall tree' }
+    tag { params.tree_builder }
         
     publishDir "${params.output_dir}/${params.tree_builder}",
         mode: 'copy',
