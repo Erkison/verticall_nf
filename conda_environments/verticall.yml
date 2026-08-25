@@ -1,7 +1,6 @@
 name: verticall
 channels:
   - conda-forge
-  - defaults
   - bioconda
 dependencies:
   - anaconda::python=3.8
